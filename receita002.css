@@ -1,0 +1,55 @@
+  @charset "UTF-8"; 
+
+  
+ th {
+
+           background-color: red;
+
+        }
+
+       body > p {
+
+            color: blue;
+
+        }
+
+        p.mote {
+
+            color: red;
+
+        } 
+
+        a:hover{
+
+            color: red;
+
+        } 
+
+        img {
+
+            border-radius: 50px;
+            height: 50px;
+            width: 50px;
+
+        } 
+
+       
+         table{
+
+            border-collapse: collapse;
+
+
+        }
+
+        td {
+
+            padding: 5px;
+            border: 1px solid black; 
+            border-collapse: collapse;
+        } 
+
+        tr.titulo{
+
+            font-weight: bolder;
+
+        }

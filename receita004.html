@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>   
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; }
+    ul { list-style-type: disc; padding-left: 20px; }
+  </style>
+</head>
+
+<body>
+  <!-- Área de conteúdo -->
+  <div id="conteudo"></div>
+
+  <!-- Botões -->
+  <div id="botoes">
+    <button id="mostrarLista">Mostrar Lista</button>
+    <button id="mostrarNumerada">Mostrar Numerada</button>
+    <button id="ordenar">Ordenar</button>
+    <button id="adicionar">Adicionar Nova</button>
+    <button id="limpar">Limpar</button>
+  </div>
+</body>   
+
+<script>
+  // Array inicial
+  let cervejas = ["Guinness", "Desperados", "Becks"];
+
+  // Função para exibir como lista <ul>
+  function mostrarLista() {
+    let div = document.getElementById("conteudo");
+    let lista = cervejas.map(item => `<li>${item}</li>`).join("");
+    div.innerHTML = `<ul>${lista}</ul>`;
+  }
+
+  // Função para exibir lista numerada
+  function mostrarNumerada() {
+    let div = document.getElementById("conteudo");
+    let lista = cervejas.map((item, i) => `<li>${i+1}. ${item}</li>`).join("");
+    div.innerHTML = `<ol>${lista}</ol>`;
+  }
+
+  // Função para ordenar alfabeticamente
+  function ordenar() {
+    cervejas.sort();
+    mostrarLista();
+  }
+
+  // Função para adicionar uma nova cerveja
+  function adicionar() {
+    let nova = prompt("Digite o nome da nova cerveja:");
+    if (nova) {
+      cervejas.push(nova);
+      mostrarLista();
+    }
+  }
+
+  // Função para limpar a lista
+  function limpar() {
+    document.getElementById("conteudo").innerHTML = "";
+  }
+
+  // Eventos dos botões
+  document.getElementById("mostrarLista").addEventListener("click", mostrarLista);
+  document.getElementById("mostrarNumerada").addEventListener("click", mostrarNumerada);
+  document.getElementById("ordenar").addEventListener("click", ordenar);
+  document.getElementById("adicionar").addEventListener("click", adicionar);
+  document.getElementById("limpar").addEventListener("click", limpar);
+</script>
+</html>

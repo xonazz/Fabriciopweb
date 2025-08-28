@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>   
+<head>
+  <meta charset="UTF-8">
+  <style>
+    /* Div de conteúdo com fade */
+    #conteudo {
+      opacity: 0;
+      transition: opacity 0.8s ease-in-out;
+    }
+    #conteudo.visivel {
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Div do conteúdo -->
+  <div id="conteudo"></div>
+
+  <!-- Div dos botões -->
+  <div id="botoes">
+    <button id="botaoCarregar">Carregar texto</button>
+    <button id="botaoAlternar">Alternar texto</button>
+    <button id="botaoFade">Fade texto</button>
+  </div>
+</body>   
+
+<script>
+  // Exercício 1: carregar conteúdo simples
+  function carregarDiv() {
+    let div = document.getElementById("conteudo");
+    div.innerHTML = `<h1>Guinness</h1>`;
+  }
+
+  // Exercício 2: alternar entre aparecer/desaparecer
+  function alternarTexto() {
+    let div = document.getElementById("conteudo");
+    if (div.innerHTML.trim() === "") {
+      div.innerHTML = `<h1>Guinness</h1>`;
+    } else {
+      div.innerHTML = "";
+    }
+  }
+
+  // Exercício 3: fade in/out
+  function fadeTexto() {
+    let div = document.getElementById("conteudo");
+
+    if (div.classList.contains("visivel")) {
+      // sumir com fade
+      div.classList.remove("visivel");
+      setTimeout(() => { div.innerHTML = ""; }, 800); 
+    } else {
+      // aparecer com fade
+      div.innerHTML = `<h1>Guinness</h1>`;
+      setTimeout(() => { div.classList.add("visivel"); }, 50);
+    }
+  }
+
+  // Liga os botões às funções
+  document.getElementById("botaoCarregar").addEventListener("click", carregarDiv);
+  document.getElementById("botaoAlternar").addEventListener("click", alternarTexto);
+  document.getElementById("botaoFade").addEventListener("click", fadeTexto);
+</script>
+</html>
