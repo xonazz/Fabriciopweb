@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Lista de Cervejas</title>
+    <style>
+      table {
+        border-collapse: collapse;
+        width: 80%;
+        margin: 20px auto;
+        font-family: Arial, sans-serif;
+      }
+      th, td {
+        border: 1px solid #999;
+        padding: 10px;
+        text-align: left;
+      }
+      th {
+        background-color: #333;
+        color: white;
+      }
+      tr:nth-child(even) {
+        background-color: #f2f2f2;
+      }
+      tr:hover {
+        background-color: #ddd;
+      }
+      a {
+        display: block;
+        text-align: center;
+        margin: 20px;
+        font-size: 18px;
+        text-decoration: none;
+        color: #007BFF;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div>
+      <a href="#" id="linkCarregar">Carregar cervejas...</a>
+    </div>
+    <div id="cervejasDiv"></div>
+
+    <script>
+      const cervejas = [
+        {
+          name: "Guiness",
+          alcohol: "10%",
+          style: "Imperial Stout",
+          ibu: "45"
+        },
+        {
+          name: "Desperados",
+          alcohol: "6%",
+          style: "Lager",
+          ibu: "22"
+        },
+        {
+          name: "Becks",
+          alcohol: "5%",
+          style: "Pilsen",
+          ibu: "18"
+        }
+      ];
+
+     
+      const carregarDiv = (
+        data,
+        headers = ["Nome", "Álcool", "Estilo", "Amargor"],
+        props = ["name", "alcohol", "style", "ibu"],
+        targetId = "cervejasDiv"
+      ) => {
+        const target = document.getElementById(targetId);
+
+        if (!target) {
+          console.error(`Elemento com id '${targetId}' não encontrado.`);
+          return;
+        }
+
+        if (!Array.isArray(data) || data.length === 0) {
+          target.innerHTML = "<p>Nenhum dado disponível.</p>";
+          return;
+        }
+
+        const headerHtml = headers.map(h => `<th>${h}</th>`).join("");
+        const rowsHtml = data.map(item => {
+          const row = props.map(prop => `<td>${item[prop] ?? ""}</td>`).join("");
+          return `<tr>${row}</tr>`;
+        }).join("\n");
+
+        const tableHtml = `
+          <table>
+            <thead><tr>${headerHtml}</tr></thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>
+        `;
+
+        target.innerHTML = tableHtml;
+      };
+
+      const link = document.getElementById("linkCarregar");
+
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        carregarDiv(cervejas);
+      });
+    </script>
+  </body>
+</html>

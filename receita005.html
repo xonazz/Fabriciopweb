@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Lista de Sorvetes</title>
+  </head>
+
+  <body>
+    <div><a href="#" id="linkCarregar">Carregando sorvetes...</a></div>
+    <div id="conteudo"></div>
+  </body>
+
+  <script>
+    const sorvetes = ["Napolitano", "Morango", "Chocolate", "Baunilha", "Pistache"];
+
+    const carregarDiv = (sorvs) => {
+      const div = document.getElementById("conteudo");
+      const sorvetesHtml = sorvs.map(sorvete => `<h1>${sorvete}</h1>`);
+      div.innerHTML = sorvetesHtml.join("\n");
+    };
+
+    const link = document.getElementById("linkCarregar");
+
+    link.addEventListener("click", (evento) => {
+      evento.preventDefault(); 
+      carregarDiv(sorvetes);
+    });
+  </script>
+</html>
