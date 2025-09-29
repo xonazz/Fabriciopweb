@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Random API Demo - debug</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body { font-family: Arial, sans-serif; background:#f5f5f5; margin:20px; }
+    header { display:flex; align-items:center; gap:12px; }
+    button { padding:10px 16px; margin:6px; background:#ffcc00; border:none; border-radius:6px; cursor:pointer; font-weight:700; }
+    button:disabled { opacity:.6; cursor:default; }
+    #dadosDiv { margin-top:16px; }
+    table { width:100%; border-collapse:collapse; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,.08); border-radius:8px; overflow:hidden; }
+    th, td { padding:10px; border-bottom:1px solid #eee; text-align:left; }
+    th { background:#ffe066; }
+    .msg-erro { color:#900; font-weight:700; margin-top:12px; }
+    .small { font-size:.9rem; color:#444; margin-top:8px; }
+    pre { background:#222; color:#fff; padding:10px; border-radius:6px; overflow:auto; max-height:200px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h2>Random API — Demo</h2>
+    <div>
+      <button id="btnCervejas">Carregar Cervejas</button>
+      <button id="btnUsuarios">Carregar Usuários</button>
+    </div>
+  </header>
+
+  <div id="dadosDiv"></div>
+  <div id="erroDiv" class="msg-erro" aria-live="polite"></div>
+  <div class="small">
+    Abra o console (F12) para ver logs detalhados. Se abrir pelo `file://` você pode ter erros de CORS — veja instruções abaixo.
+  </div>
+
+  <script>
+    // --- helpers ---
+    function escapeHtml(str) {
+      return str.replace(/[&<>"'`]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'})[s]);
+    }
+
+    function getVal(obj, path) {
+      if (!path) return '';
+      return path.split('.').reduce((o,k) => (o && o[k] !== undefined) ? o[k] : '', obj);
+    }
+
+    function montarTabela(dados, campos, titulos) {
+      if (!Array.isArray(dados) || dados.length === 0) return '<div>Nenhum dado retornado.</div>';
+      const headers = (titulos || campos).map(h => `<th>${escapeHtml(h)}</th>`).join('');
+      const linhas = dados.map(obj => {
+        const cols = campos.map(c => `<td>${escapeHtml(String(getVal(obj,c) ?? ''))}</td>`).join('');
+        return `<tr>${cols}</tr>`;
+      }).join('');
+      return `<table><thead><tr>${headers}</tr></thead><tbody>${linhas}</tbody></table>`;
+    }
+
+    // --- fetch com fallback para dois domínios e melhor tratamento de erro ---
+    async function fetchComFallback(paths) {
+      // paths: array de URLs
+      for (const url of paths) {
+        try {
+          console.log('Tentando:', url);
+          const res = await fetch(url, { mode: 'cors', headers: { 'Accept': 'application/json' } });
+          if (!res.ok) {
+            console.warn('Resposta não ok', res.status, res.statusText, url);
+            // tentar próximo URL
+            continue;
+          }
+          // tentar parse JSON
+          const contentType = res.headers.get('content-type') || '';
+          const text = await res.text();
+          try {
+            const json = JSON.parse(text);
+            return { json, url };
+          } catch(parseErr) {
+            console.error('Falha ao parsear JSON da URL:', url, parseErr);
+            // continue para próximo
+            continue;
+          }
+        } catch (err) {
+          console.error('Erro fetch (network/CORS?) para', url, err);
+          // continua para próximo
+          continue;
+        }
+      }
+      // se chegou aqui, todos falharam
+      throw new Error('Todas as tentativas falharam (CORS / rede / 404). Veja console para detalhes.');
+    }
+
+    // --- operações específicas ---
+    async function carregarCervejas() {
+      setLoading(true);
+      clearErro();
+      const urls = [
+        'https://random-data-api.com/api/v2/beers?size=5',
+        'https://random-data-ai.com/api/v2/beers?size=5' // fallback caso tenha usado o outro domínio
+      ];
+      try {
+        const { json, url } = await fetchComFallback(urls);
+        document.getElementById('dadosDiv').innerHTML = montarTabela(json, ['name','brand','style','alcohol','blg'], ['Nome','Marca','Estilo','Álcool','BLG']);
+        console.log('Dados carregados de', url, json);
+      } catch (err) {
+        showErro(err.message);
+      } finally { setLoading(false); }
+    }
+
+    async function carregarUsuarios() {
+      setLoading(true);
+      clearErro();
+      const urls = [
+        'https://random-data-api.com/api/v2/users?size=5',
+        'https://random-data-ai.com/api/v2/users?size=5'
+      ];
+      try {
+        const { json, url } = await fetchComFallback(urls);
+        document.getElementById('dadosDiv').innerHTML = montarTabela(json, ['first_name','last_name','email','username'], ['Nome','Sobrenome','Email','Usuario']);
+        console.log('Dados carregados de', url, json);
+      } catch (err) {
+        showErro(err.message);
+      } finally { setLoading(false); }
+    }
+
+    function setLoading(isLoading){
+      document.getElementById('btnCervejas').disabled = isLoading;
+      document.getElementById('btnUsuarios').disabled = isLoading;
+      if (isLoading) document.getElementById('dadosDiv').innerHTML = '<div>Carregando...</div>';
+    }
+
+    function showErro(msg){
+      document.getElementById('erroDiv').textContent = 'Erro: ' + msg;
+      console.error('Mostrar erro para usuário:', msg);
+    }
+    function clearErro(){ document.getElementById('erroDiv').textContent = ''; }
+
+    document.getElementById('btnCervejas').addEventListener('click', carregarCervejas);
+    document.getElementById('btnUsuarios').addEventListener('click', carregarUsuarios);
+
+    // --- instruções úteis (mostradas no console) ---
+    console.log('Se você abriu este arquivo com file://, é muito provável que o browser bloqueie requisições por CORS.');
+    console.log('Recomendo abrir via servidor local, por ex.:');
+    console.log('  Python 3:    python3 -m http.server 8000   (abra http://localhost:8000)');
+    console.log('  Node (npx):  npx http-server                (abra http://localhost:8080 por padrão)');
+   // console.log('Se receber no console: "Access to fetch at ... from origin ' + "'null' has been blocked by CORS policy", então rode o servidor local.');
+  </script>
+</body>
+</html>
